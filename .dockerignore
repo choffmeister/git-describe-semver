@@ -1,0 +1,11 @@
+.git
+
+.dockerignore
+.editorconfig
+.gitignore
+Dockerfile
+LICENSE
+Makefile
+README.md
+
+git-describe-semver*
