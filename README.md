@@ -12,10 +12,18 @@ Corresponding git tag | git describe --tags | git-describe-semver
 
 ## Usage
 
-```
-# binary
-# TODO
+### Binary
 
-# with docker
+```bash
+cd my-git-directory
+wget -q https://github.com/choffmeister/git-describe-semver/releases/download/v0.0.1/git-describe-semver-linux-amd64
+chmod +x git-describe-semver-linux-amd64
+./git-describe-semver-linux-amd64
+```
+
+### Docker
+
+```bash
+cd my-git-directory
 docker run --rm -v $PWD:/workdir choffmeister/git-describe-semver:latest
 ```
