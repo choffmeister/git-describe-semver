@@ -10,17 +10,26 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
+// GenerateVersionOptions ...
+type GenerateVersionOptions struct {
+	FallbackTagName string
+	DropTagNamePrefix bool
+}
+
 // GenerateVersion ...
-func GenerateVersion(tagName string, counter int, headHash string, fallbackTagName string) (*string, error) {
+func GenerateVersion(tagName string, counter int, headHash string, opts GenerateVersionOptions) (*string, error) {
 	devPreRelease := []string{"dev", strconv.Itoa(counter)}
 	buildMetadata := []string{"g" + (headHash)[0:7]}
 	if tagName == "" {
-		version := SemVerParse(fallbackTagName)
+		version := SemVerParse(opts.FallbackTagName)
 		if version == nil {
 			return nil, fmt.Errorf("unable to parse fallback tag")
 		}
 		version.PreRelease = devPreRelease
 		version.BuildMetadata = buildMetadata
+		if opts.DropTagNamePrefix {
+			version.Prefix = ""
+		}
 		result := version.String()
 		return &result, nil
 	}
@@ -51,12 +60,15 @@ func GenerateVersion(tagName string, counter int, headHash string, fallbackTagNa
 			BuildMetadata: buildMetadata,
 		}
 	}
+	if opts.DropTagNamePrefix {
+		version.Prefix = ""
+	}
 	result := version.String()
 	return &result, nil
 }
 
 // Run ...
-func Run(dir string, fallback string) (*string, error) {
+func Run(dir string, opts GenerateVersionOptions) (*string, error) {
 	repo, err := git.PlainOpen(dir)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open git repository: %v", err)
@@ -65,7 +77,7 @@ func Run(dir string, fallback string) (*string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to describe commit: %v", err)
 	}
-	result, err := GenerateVersion(*tagName, *counter, *headHash, fallback)
+	result, err := GenerateVersion(*tagName, *counter, *headHash, opts)
 	if err != nil {
 		return nil, fmt.Errorf("unable to generate version: %v", err)
 	}
@@ -74,13 +86,18 @@ func Run(dir string, fallback string) (*string, error) {
 
 func main() {
 	fallback := flag.String("fallback", "", "The first version to fallback to should there be no tag")
+	dropPrefix := flag.Bool("drop-prefix", false, "Drop prefix from output")
 	flag.Parse()
 
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("unable to determine current directory: %v\n", err)
 	}
-	result, err := Run(dir, *fallback)
+	opts := GenerateVersionOptions{
+		FallbackTagName: *fallback,
+		DropTagNamePrefix: *dropPrefix,
+	}
+	result, err := Run(dir, opts)
 	if err != nil {
 		log.Fatalf("unable to generate version: %v\n", err)
 	}

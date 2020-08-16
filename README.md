@@ -14,6 +14,9 @@ none | fail | `v0.0.0-dev.23+gabc1234`
 
 ## Usage
 
+* Flag `--fallback v0.0.0`: Fallback to given tag name if no tag is available
+* Flag `--drop-prefix`: Drop any present prefix (like `v`) from the output
+
 ### Binary
 
 ```bash
