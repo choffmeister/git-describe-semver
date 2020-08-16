@@ -8,5 +8,5 @@ LICENSE
 Makefile
 README.md
 
+build/
 coverage.out
-git-describe-semver*

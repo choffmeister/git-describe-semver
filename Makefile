@@ -15,9 +15,10 @@ run:
 	go run .
 
 build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o git-describe-semver-linux-amd64 .
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o git-describe-semver-darwin-amd64 .
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o git-describe-semver-windows-amd64 .
+	mkdir -p build/
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/git-describe-semver-linux-amd64 .
+	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o build/git-describe-semver-darwin-amd64 .
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o build/git-describe-semver-windows-amd64.exe .
 
 test:
 	go test -v
