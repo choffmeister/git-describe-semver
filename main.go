@@ -11,14 +11,16 @@ import (
 
 // GenerateVersion ...
 func GenerateVersion(tagName string, counter int, headHash string) (*string, error) {
-	devPreRelease := []string{"dev", strconv.Itoa(counter), "g" + (headHash)[0:7]}
+	devPreRelease := []string{"dev", strconv.Itoa(counter)}
+	buildMetadata := []string{"g" + (headHash)[0:7]}
 	if tagName == "" {
 		version := SemVer{
-			Prefix:     "v",
-			Major:      0,
-			Minor:      0,
-			Patch:      0,
-			PreRelease: devPreRelease,
+			Prefix:        "v",
+			Major:         0,
+			Minor:         0,
+			Patch:         0,
+			PreRelease:    devPreRelease,
+			BuildMetadata: buildMetadata,
 		}
 		result := version.String()
 		return &result, nil
@@ -38,7 +40,7 @@ func GenerateVersion(tagName string, counter int, headHash string) (*string, err
 			Minor:         version.Minor,
 			Patch:         version.Patch,
 			PreRelease:    append(version.PreRelease, devPreRelease...),
-			BuildMetadata: version.BuildMetadata,
+			BuildMetadata: buildMetadata,
 		}
 	} else {
 		version = &SemVer{
@@ -47,7 +49,7 @@ func GenerateVersion(tagName string, counter int, headHash string) (*string, err
 			Minor:         version.Minor,
 			Patch:         version.Patch + 1,
 			PreRelease:    devPreRelease,
-			BuildMetadata: version.BuildMetadata,
+			BuildMetadata: buildMetadata,
 		}
 	}
 	result := version.String()

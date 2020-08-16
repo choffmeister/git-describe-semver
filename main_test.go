@@ -15,7 +15,8 @@ func TestGenerateVersion(t *testing.T) {
 	}
 
 	test("0.0.0", 0, "abc1234", "0.0.0")
-	test("0.0.0", 1, "abc1234", "0.0.1-dev.1.gabc1234")
-	test("0.0.0-rc1", 1, "abc1234", "0.0.0-rc1.dev.1.gabc1234")
-	test("0.0.0-rc.1", 1, "abc1234", "0.0.0-rc.1.dev.1.gabc1234")
+	test("0.0.0", 1, "abc1234", "0.0.1-dev.1+gabc1234")
+	test("0.0.0-rc1", 1, "abc1234", "0.0.0-rc1.dev.1+gabc1234")
+	test("0.0.0-rc.1", 1, "abc1234", "0.0.0-rc.1.dev.1+gabc1234")
+	test("0.0.0-rc.1+foobar", 1, "abc1234", "0.0.0-rc.1.dev.1+gabc1234")
 }
