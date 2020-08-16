@@ -8,8 +8,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-// GetTagMap ...
-func GetTagMap(repo git.Repository) (*map[string]string, error) {
+// GitTagMap ...
+func GitTagMap(repo git.Repository) (*map[string]string, error) {
 	iter, err := repo.Tags()
 	if err != nil {
 		return nil, err
@@ -22,14 +22,14 @@ func GetTagMap(repo git.Repository) (*map[string]string, error) {
 	return &tagMap, nil
 }
 
-// Describe ...
-func Describe(repo git.Repository) (*string, *int, *string, error) {
+// GitDescribe ...
+func GitDescribe(repo git.Repository) (*string, *int, *string, error) {
 	head, err := repo.Head()
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("unable to find head: %v", err)
 	}
 	headHash := head.Hash().String()
-	tags, err := GetTagMap(repo)
+	tags, err := GitTagMap(repo)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("unable to get tags: %v", err)
 	}

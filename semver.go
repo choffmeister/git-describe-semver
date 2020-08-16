@@ -66,15 +66,10 @@ func SemVerParse(str string) *SemVer {
 	}
 }
 
-func isNumber(s string) bool {
-	_, err := strconv.Atoi(s)
-	return err == nil
-}
-
 func stringToSlice(s string, sep string) []string {
 	temp := strings.Split(s, sep)
 	if temp[0] == "" {
-		return []string{}
+		return []string(nil)
 	}
 	return temp
 }

@@ -2,14 +2,15 @@ package main
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSemVerString(t *testing.T) {
+	assert := assert.New(t)
 	test := func(input SemVer, expected string) {
 		actual := input.String()
-		if actual != expected {
-			t.Errorf("expected %v to be string as %v, got %v", input, expected, actual)
-		}
+		assert.Equal(expected, actual)
 	}
 
 	test(SemVer{}, "0.0.0")
@@ -22,13 +23,10 @@ func TestSemVerString(t *testing.T) {
 }
 
 func TestSemVerParse(t *testing.T) {
+	assert := assert.New(t)
 	test := func(input string, expected *SemVer) {
 		actual := SemVerParse(input)
-		if actual == nil && expected == nil {
-			// ok
-		} else if actual == nil || expected == nil || !actual.Equal(*expected) {
-			t.Errorf("expected %v to be parsed as %v, got %v", input, expected, actual)
-		}
+		assert.Equal(expected, actual)
 	}
 
 	test("0.0.0", &SemVer{})
@@ -39,4 +37,25 @@ func TestSemVerParse(t *testing.T) {
 	test("0.0.0+foo.bar", &SemVer{BuildMetadata: []string{"foo", "bar"}})
 	test("v1.2.3-rc.1+foo.bar", &SemVer{Prefix: "v", Major: 1, Minor: 2, Patch: 3, PreRelease: []string{"rc", "1"}, BuildMetadata: []string{"foo", "bar"}})
 	test("invalid", nil)
+}
+
+func TestSemVerEqual(t *testing.T) {
+	assert := assert.New(t)
+	test := func(a SemVer, b SemVer, expected bool) {
+		actual := a.Equal(b)
+		assert.Equal(expected, actual)
+	}
+
+	test(SemVer{}, SemVer{}, true)
+	test(SemVer{Major: 1}, SemVer{Major: 2}, false)
+	test(SemVer{Minor: 1}, SemVer{Minor: 2}, false)
+	test(SemVer{Patch: 1}, SemVer{Patch: 2}, false)
+	test(SemVer{PreRelease: []string{"foo"}}, SemVer{PreRelease: []string{"foo"}}, true)
+	test(SemVer{PreRelease: []string{"foo"}}, SemVer{PreRelease: []string{"bar"}}, false)
+	test(SemVer{PreRelease: []string{"foo"}}, SemVer{}, false)
+	test(SemVer{}, SemVer{PreRelease: []string{"bar"}}, false)
+	test(SemVer{BuildMetadata: []string{"foo"}}, SemVer{BuildMetadata: []string{"foo"}}, true)
+	test(SemVer{BuildMetadata: []string{"foo"}}, SemVer{BuildMetadata: []string{"bar"}}, false)
+	test(SemVer{BuildMetadata: []string{"foo"}}, SemVer{}, false)
+	test(SemVer{}, SemVer{BuildMetadata: []string{"bar"}}, false)
 }

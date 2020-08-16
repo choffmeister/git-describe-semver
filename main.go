@@ -56,20 +56,29 @@ func GenerateVersion(tagName string, counter int, headHash string) (*string, err
 	return &result, nil
 }
 
+// Run ...
+func Run(dir string) (*string, error) {
+	repo, err := git.PlainOpen(dir)
+	if err != nil {
+		return nil, fmt.Errorf("unable to open git repository: %v", err)
+	}
+	tagName, counter, headHash, err := GitDescribe(*repo)
+	if err != nil {
+		return nil, fmt.Errorf("unable to find head: %v", err)
+	}
+	result, err := GenerateVersion(*tagName, *counter, *headHash)
+	if err != nil {
+		return nil, fmt.Errorf("unable to generate version: %v", err)
+	}
+	return result, nil
+}
+
 func main() {
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("unable to determine current directory: %v\n", err)
 	}
-	repo, err := git.PlainOpen(dir)
-	if err != nil {
-		log.Fatalf("unable to open git repository: %v\n", err)
-	}
-	tagName, counter, headHash, err := Describe(*repo)
-	if err != nil {
-		log.Fatalf("unable to find head: %v\n", err)
-	}
-	result, err := GenerateVersion(*tagName, *counter, *headHash)
+	result, err := Run(dir)
 	if err != nil {
 		log.Fatalf("unable to generate version: %v\n", err)
 	}

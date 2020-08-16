@@ -28,6 +28,11 @@ test:
 test-watch:
 	watch -n1 go test -v
 
+test-cover:
+	go test -coverprofile=coverage.out
+	go tool cover -func=coverage.out
+	go tool cover -html=coverage.out
+
 container:
 	docker build -t $(IMAGE):$(VERSION) .
 
