@@ -18,15 +18,13 @@ type GenerateVersionOptions struct {
 
 // GenerateVersion ...
 func GenerateVersion(tagName string, counter int, headHash string, opts GenerateVersionOptions) (*string, error) {
-	devPreRelease := []string{"dev", strconv.Itoa(counter)}
-	buildMetadata := []string{"g" + (headHash)[0:7]}
+	devPreRelease := []string{"dev", strconv.Itoa(counter), "g" + (headHash)[0:7]}
 	if tagName == "" {
 		version := SemVerParse(opts.FallbackTagName)
 		if version == nil {
 			return nil, fmt.Errorf("unable to parse fallback tag")
 		}
 		version.PreRelease = devPreRelease
-		version.BuildMetadata = buildMetadata
 		if opts.DropTagNamePrefix {
 			version.Prefix = ""
 		}
@@ -48,7 +46,7 @@ func GenerateVersion(tagName string, counter int, headHash string, opts Generate
 			Minor:         version.Minor,
 			Patch:         version.Patch,
 			PreRelease:    append(version.PreRelease, devPreRelease...),
-			BuildMetadata: buildMetadata,
+			BuildMetadata: append([]string{}, version.BuildMetadata...),
 		}
 	} else {
 		version = &SemVer{
@@ -57,7 +55,7 @@ func GenerateVersion(tagName string, counter int, headHash string, opts Generate
 			Minor:         version.Minor,
 			Patch:         version.Patch + 1,
 			PreRelease:    devPreRelease,
-			BuildMetadata: buildMetadata,
+			BuildMetadata: append([]string{}, version.BuildMetadata...),
 		}
 	}
 	if opts.DropTagNamePrefix {
