@@ -14,48 +14,49 @@ import (
 type GenerateVersionOptions struct {
 	FallbackTagName string
 	DropTagNamePrefix bool
+	PrereleaseSuffix string
 }
 
 // GenerateVersion ...
 func GenerateVersion(tagName string, counter int, headHash string, opts GenerateVersionOptions) (*string, error) {
-	devPreRelease := []string{"dev", strconv.Itoa(counter), "g" + (headHash)[0:7]}
+	devPrerelease := []string{"dev", strconv.Itoa(counter), "g" + (headHash)[0:7]}
+	if opts.PrereleaseSuffix != "" {
+		devPrerelease[len(devPrerelease) - 1] = devPrerelease[len(devPrerelease) - 1] + "-" + opts.PrereleaseSuffix
+	}
+	version := &SemVer{}
 	if tagName == "" {
-		version := SemVerParse(opts.FallbackTagName)
+		version = SemVerParse(opts.FallbackTagName)
 		if version == nil {
 			return nil, fmt.Errorf("unable to parse fallback tag")
 		}
-		version.PreRelease = devPreRelease
-		if opts.DropTagNamePrefix {
-			version.Prefix = ""
-		}
-		result := version.String()
-		return &result, nil
-	}
-	version := SemVerParse(tagName)
-	if version == nil {
-		return nil, fmt.Errorf("unable to parse tag")
-	}
-	if counter == 0 {
-		result := version.String()
-		return &result, nil
-	}
-	if len(version.PreRelease) > 0 {
-		version = &SemVer{
-			Prefix:        version.Prefix,
-			Major:         version.Major,
-			Minor:         version.Minor,
-			Patch:         version.Patch,
-			PreRelease:    append(version.PreRelease, devPreRelease...),
-			BuildMetadata: append([]string{}, version.BuildMetadata...),
-		}
+		version.Prerelease = devPrerelease
 	} else {
-		version = &SemVer{
-			Prefix:        version.Prefix,
-			Major:         version.Major,
-			Minor:         version.Minor,
-			Patch:         version.Patch + 1,
-			PreRelease:    devPreRelease,
-			BuildMetadata: append([]string{}, version.BuildMetadata...),
+		version = SemVerParse(tagName)
+		if version == nil {
+			return nil, fmt.Errorf("unable to parse tag")
+		}
+		if counter == 0 {
+			result := version.String()
+			return &result, nil
+		}
+		if len(version.Prerelease) > 0 {
+			version = &SemVer{
+				Prefix:        version.Prefix,
+				Major:         version.Major,
+				Minor:         version.Minor,
+				Patch:         version.Patch,
+				Prerelease:    append(version.Prerelease, devPrerelease...),
+				BuildMetadata: append([]string{}, version.BuildMetadata...),
+			}
+		} else {
+			version = &SemVer{
+				Prefix:        version.Prefix,
+				Major:         version.Major,
+				Minor:         version.Minor,
+				Patch:         version.Patch + 1,
+				Prerelease:    devPrerelease,
+				BuildMetadata: append([]string{}, version.BuildMetadata...),
+			}
 		}
 	}
 	if opts.DropTagNamePrefix {
@@ -85,6 +86,7 @@ func Run(dir string, opts GenerateVersionOptions) (*string, error) {
 func main() {
 	fallback := flag.String("fallback", "", "The first version to fallback to should there be no tag")
 	dropPrefix := flag.Bool("drop-prefix", false, "Drop prefix from output")
+	prereleaseSuffix := flag.String("prerelease-suffix", "", "Suffix to add to prereleases")
 	flag.Parse()
 
 	dir, err := os.Getwd()
@@ -94,6 +96,7 @@ func main() {
 	opts := GenerateVersionOptions{
 		FallbackTagName: *fallback,
 		DropTagNamePrefix: *dropPrefix,
+		PrereleaseSuffix: *prereleaseSuffix,
 	}
 	result, err := Run(dir, opts)
 	if err != nil {

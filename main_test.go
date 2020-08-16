@@ -14,7 +14,6 @@ func TestGenerateVersion(t *testing.T) {
 		actual, err := GenerateVersion(inputTagName, inputCounter, inputHeadHash, inputOpts)
 		if assert.NoError(err) {
 			assert.Equal(expected, *actual)
-
 		}
 	}
 
@@ -29,6 +28,10 @@ func TestGenerateVersion(t *testing.T) {
 	test("", 1, "abc1234", GenerateVersionOptions{FallbackTagName: "0.0.0"}, "0.0.0-dev.1.gabc1234")
 	test("", 1, "abc1234", GenerateVersionOptions{FallbackTagName: "v0.0.0"}, "v0.0.0-dev.1.gabc1234")
 	test("", 1, "abc1234", GenerateVersionOptions{FallbackTagName: "v0.0.0", DropTagNamePrefix: true}, "0.0.0-dev.1.gabc1234")
+
+	test("v0.0.0", 0, "abc1234", GenerateVersionOptions{PrereleaseSuffix: "SNAPSHOT"}, "v0.0.0")
+	test("v0.0.0", 1, "abc1234", GenerateVersionOptions{PrereleaseSuffix: "SNAPSHOT"}, "v0.0.1-dev.1.gabc1234-SNAPSHOT")
+
 	_, err := GenerateVersion("", 1, "abc1234", GenerateVersionOptions{})
 	assert.Error(err)
 }

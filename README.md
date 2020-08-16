@@ -16,20 +16,21 @@ none | fail | `v0.0.0-dev.23.gabc1234`
 
 * Flag `--fallback v0.0.0`: Fallback to given tag name if no tag is available
 * Flag `--drop-prefix`: Drop any present prefix (like `v`) from the output
+* Flag `--prerelease-suffix`: Adds a dash-separated suffix to the prerelease part
 
 ### Binary
 
 ```bash
 cd my-git-directory
-wget -q https://github.com/choffmeister/git-describe-semver/releases/download/v0.2.0/git-describe-semver-linux-amd64
+wget -q https://github.com/choffmeister/git-describe-semver/releases/download/v0.2.1/git-describe-semver-linux-amd64
 chmod +x git-describe-semver-linux-amd64
-./git-describe-semver-linux-amd64 --fallback v0.0.0
+./git-describe-semver-linux-amd64
 ```
 
 ### Docker
 
 ```bash
 cd my-git-directory
-docker pull choffmeister/git-describe-semver:v0.2.0
-docker run --rm -v $PWD:/workdir choffmeister/git-describe-semver:v0.2.0 --fallback v0.0.0
+docker pull choffmeister/git-describe-semver:v0.2.1
+docker run --rm -v $PWD:/workdir choffmeister/git-describe-semver:v0.2.1
 ```
