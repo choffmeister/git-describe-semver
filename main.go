@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -10,18 +11,16 @@ import (
 )
 
 // GenerateVersion ...
-func GenerateVersion(tagName string, counter int, headHash string) (*string, error) {
+func GenerateVersion(tagName string, counter int, headHash string, fallbackTagName string) (*string, error) {
 	devPreRelease := []string{"dev", strconv.Itoa(counter)}
 	buildMetadata := []string{"g" + (headHash)[0:7]}
 	if tagName == "" {
-		version := SemVer{
-			Prefix:        "v",
-			Major:         0,
-			Minor:         0,
-			Patch:         0,
-			PreRelease:    devPreRelease,
-			BuildMetadata: buildMetadata,
+		version := SemVerParse(fallbackTagName)
+		if version == nil {
+			return nil, fmt.Errorf("unable to parse fallback tag")
 		}
+		version.PreRelease = devPreRelease
+		version.BuildMetadata = buildMetadata
 		result := version.String()
 		return &result, nil
 	}
@@ -57,16 +56,16 @@ func GenerateVersion(tagName string, counter int, headHash string) (*string, err
 }
 
 // Run ...
-func Run(dir string) (*string, error) {
+func Run(dir string, fallback string) (*string, error) {
 	repo, err := git.PlainOpen(dir)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open git repository: %v", err)
 	}
 	tagName, counter, headHash, err := GitDescribe(*repo)
 	if err != nil {
-		return nil, fmt.Errorf("unable to find head: %v", err)
+		return nil, fmt.Errorf("unable to describe commit: %v", err)
 	}
-	result, err := GenerateVersion(*tagName, *counter, *headHash)
+	result, err := GenerateVersion(*tagName, *counter, *headHash, fallback)
 	if err != nil {
 		return nil, fmt.Errorf("unable to generate version: %v", err)
 	}
@@ -74,11 +73,14 @@ func Run(dir string) (*string, error) {
 }
 
 func main() {
+	fallback := flag.String("fallback", "", "The first version to fallback to should there be no tag")
+	flag.Parse()
+
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("unable to determine current directory: %v\n", err)
 	}
-	result, err := Run(dir)
+	result, err := Run(dir, *fallback)
 	if err != nil {
 		log.Fatalf("unable to generate version: %v\n", err)
 	}

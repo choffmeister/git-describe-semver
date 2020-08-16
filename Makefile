@@ -14,9 +14,6 @@ VERSION := $(shell git describe --tags --always --dirty)
 run:
 	go run .
 
-run-watch:
-	watch -n1 go run .
-
 build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o git-describe-semver-linux-amd64 .
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o git-describe-semver-darwin-amd64 .
