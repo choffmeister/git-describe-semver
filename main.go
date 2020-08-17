@@ -12,16 +12,16 @@ import (
 
 // GenerateVersionOptions ...
 type GenerateVersionOptions struct {
-	FallbackTagName string
+	FallbackTagName   string
 	DropTagNamePrefix bool
-	PrereleaseSuffix string
+	PrereleaseSuffix  string
 }
 
 // GenerateVersion ...
 func GenerateVersion(tagName string, counter int, headHash string, opts GenerateVersionOptions) (*string, error) {
 	devPrerelease := []string{"dev", strconv.Itoa(counter), "g" + (headHash)[0:7]}
 	if opts.PrereleaseSuffix != "" {
-		devPrerelease[len(devPrerelease) - 1] = devPrerelease[len(devPrerelease) - 1] + "-" + opts.PrereleaseSuffix
+		devPrerelease[len(devPrerelease)-1] = devPrerelease[len(devPrerelease)-1] + "-" + opts.PrereleaseSuffix
 	}
 	version := &SemVer{}
 	if tagName == "" {
@@ -35,27 +35,25 @@ func GenerateVersion(tagName string, counter int, headHash string, opts Generate
 		if version == nil {
 			return nil, fmt.Errorf("unable to parse tag")
 		}
-		if counter == 0 {
-			result := version.String()
-			return &result, nil
-		}
-		if len(version.Prerelease) > 0 {
-			version = &SemVer{
-				Prefix:        version.Prefix,
-				Major:         version.Major,
-				Minor:         version.Minor,
-				Patch:         version.Patch,
-				Prerelease:    append(version.Prerelease, devPrerelease...),
-				BuildMetadata: append([]string{}, version.BuildMetadata...),
-			}
-		} else {
-			version = &SemVer{
-				Prefix:        version.Prefix,
-				Major:         version.Major,
-				Minor:         version.Minor,
-				Patch:         version.Patch + 1,
-				Prerelease:    devPrerelease,
-				BuildMetadata: append([]string{}, version.BuildMetadata...),
+		if counter > 0 {
+			if len(version.Prerelease) > 0 {
+				version = &SemVer{
+					Prefix:        version.Prefix,
+					Major:         version.Major,
+					Minor:         version.Minor,
+					Patch:         version.Patch,
+					Prerelease:    append(version.Prerelease, devPrerelease...),
+					BuildMetadata: append([]string{}, version.BuildMetadata...),
+				}
+			} else {
+				version = &SemVer{
+					Prefix:        version.Prefix,
+					Major:         version.Major,
+					Minor:         version.Minor,
+					Patch:         version.Patch + 1,
+					Prerelease:    devPrerelease,
+					BuildMetadata: append([]string{}, version.BuildMetadata...),
+				}
 			}
 		}
 	}
@@ -94,9 +92,9 @@ func main() {
 		log.Fatalf("unable to determine current directory: %v\n", err)
 	}
 	opts := GenerateVersionOptions{
-		FallbackTagName: *fallback,
+		FallbackTagName:   *fallback,
 		DropTagNamePrefix: *dropPrefix,
-		PrereleaseSuffix: *prereleaseSuffix,
+		PrereleaseSuffix:  *prereleaseSuffix,
 	}
 	result, err := Run(dir, opts)
 	if err != nil {
