@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,16 +23,24 @@ func TestGitTagMap(t *testing.T) {
 	commit1, _ := worktree.Commit("first", &git.CommitOptions{})
 	tag1, _ := repo.CreateTag("v1.0.0", commit1, nil)
 	tags, _ = GitTagMap(*repo)
+	assert.Equal(commit1.String(), tag1.Hash().String())
 	assert.Equal(map[string]string{
 		tag1.Hash().String(): "v1.0.0",
 	}, *tags)
 
 	commit2, _ := worktree.Commit("second", &git.CommitOptions{})
-	tag2, _ := repo.CreateTag("v2.0.0", commit2, nil)
+	tag2, _ := repo.CreateTag("v2.0.0", commit2, &git.CreateTagOptions{
+		Tagger: &object.Signature{
+			Name:  "Foo Bar",
+			Email: "foo@bar.com",
+		},
+		Message: "Version 2.0.0",
+	})
+	assert.NotEqual(commit2.String(), tag2.Hash().String())
 	tags, _ = GitTagMap(*repo)
 	assert.Equal(map[string]string{
-		tag1.Hash().String(): "v1.0.0",
-		tag2.Hash().String(): "v2.0.0",
+		commit1.String(): "v1.0.0",
+		commit2.String(): "v2.0.0",
 	}, *tags)
 }
 

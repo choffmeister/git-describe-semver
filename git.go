@@ -15,10 +15,22 @@ func GitTagMap(repo git.Repository) (*map[string]string, error) {
 		return nil, err
 	}
 	tagMap := map[string]string{}
-	iter.ForEach(func(r *plumbing.Reference) error {
-		tagMap[r.Hash().String()] = r.Name().Short()
+	err = iter.ForEach(func(r *plumbing.Reference) error {
+		tag, _ := repo.TagObject(r.Hash())
+		if tag == nil {
+			tagMap[r.Hash().String()] = r.Name().Short()
+		} else {
+			c, err := tag.Commit()
+			if err != nil {
+				return err
+			}
+			tagMap[c.Hash.String()] = r.Name().Short()
+		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 	return &tagMap, nil
 }
 
