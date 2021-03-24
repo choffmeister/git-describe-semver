@@ -22,7 +22,7 @@ none | fail | `v0.0.0-dev.23.gabc1234`
 
 ```bash
 cd my-git-directory
-wget -q https://github.com/choffmeister/git-describe-semver/releases/download/v0.2.2/git-describe-semver-linux-amd64
+wget -q https://github.com/choffmeister/git-describe-semver/releases/download/v0.2.4/git-describe-semver-linux-amd64
 chmod +x git-describe-semver-linux-amd64
 ./git-describe-semver-linux-amd64
 ```
@@ -31,6 +31,6 @@ chmod +x git-describe-semver-linux-amd64
 
 ```bash
 cd my-git-directory
-docker pull choffmeister/git-describe-semver:v0.2.2
-docker run --rm -v $PWD:/workdir choffmeister/git-describe-semver:v0.2.2
+docker pull choffmeister/git-describe-semver:v0.2.4
+docker run --rm -v $PWD:/workdir choffmeister/git-describe-semver:v0.2.4
 ```
