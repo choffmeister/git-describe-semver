@@ -37,5 +37,3 @@ container:
 
 container-push: container
 	docker push $(IMAGE):$(VERSION)
-	docker tag $(IMAGE):$(VERSION) $(IMAGE):latest
-	docker push $(IMAGE):latest
