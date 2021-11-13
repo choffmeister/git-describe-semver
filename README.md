@@ -21,7 +21,7 @@ none | fail | `v0.0.0-dev.23.gabc1234`
 ### Binary
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/choffmeister/git-describe-semver/master/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/choffmeister/git-describe-semver/main/install.sh)"
 cd ~/my-git-directory
 ~/bin/git-describe-semver
 ```
@@ -30,6 +30,6 @@ cd ~/my-git-directory
 
 ```bash
 cd my-git-directory
-docker pull choffmeister/git-describe-semver:latest
-docker run --rm -v $PWD:/workdir choffmeister/git-describe-semver:latest
+docker pull ghcr.io/choffmeister/git-describe-semver:latest
+docker run --rm -v $PWD:/workdir ghcr.io/choffmeister/git-describe-semver:latest
 ```

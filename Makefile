@@ -4,7 +4,7 @@
 BIN := git-describe-semver
 
 # Where to push the docker image.
-REGISTRY ?= choffmeister
+REGISTRY ?= ghcr.io/choffmeister
 
 IMAGE := $(REGISTRY)/$(BIN)
 
