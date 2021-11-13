@@ -28,9 +28,10 @@ func Run(dir string, opts internal.GenerateVersionOptions) (*string, error) {
 }
 
 func main() {
-	fallback := flag.String("fallback", "", "The first version to fallback to should there be no tag")
-	dropPrefix := flag.Bool("drop-prefix", false, "Drop prefix from output")
-	prereleaseSuffix := flag.String("prerelease-suffix", "", "Suffix to add to prereleases")
+	fallbackFlag := flag.String("fallback", "", "The first version to fallback to should there be no tag")
+	dropPrefixFlag := flag.Bool("drop-prefix", false, "Drop prefix from output")
+	prereleaseSuffixFlag := flag.String("prerelease-suffix", "", "Suffix to add to prereleases")
+	formatFlag := flag.String("format", "", "Format of output")
 	flag.Parse()
 
 	dir, err := os.Getwd()
@@ -38,9 +39,10 @@ func main() {
 		log.Fatalf("unable to determine current directory: %v\n", err)
 	}
 	opts := internal.GenerateVersionOptions{
-		FallbackTagName:   *fallback,
-		DropTagNamePrefix: *dropPrefix,
-		PrereleaseSuffix:  *prereleaseSuffix,
+		FallbackTagName:   *fallbackFlag,
+		DropTagNamePrefix: *dropPrefixFlag,
+		PrereleaseSuffix:  *prereleaseSuffixFlag,
+		Format:            *formatFlag,
 	}
 	result, err := Run(dir, opts)
 	if err != nil {

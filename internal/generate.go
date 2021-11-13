@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // GenerateVersionOptions ...
@@ -10,6 +11,7 @@ type GenerateVersionOptions struct {
 	FallbackTagName   string
 	DropTagNamePrefix bool
 	PrereleaseSuffix  string
+	Format            string
 }
 
 // GenerateVersion ...
@@ -56,5 +58,8 @@ func GenerateVersion(tagName string, counter int, headHash string, opts Generate
 		version.Prefix = ""
 	}
 	result := version.String()
+	if opts.Format != "" {
+		result = strings.ReplaceAll(opts.Format, "<version>", result)
+	}
 	return &result, nil
 }

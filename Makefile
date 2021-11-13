@@ -7,9 +7,7 @@ BIN := git-describe-semver
 REGISTRY ?= ghcr.io/choffmeister
 
 IMAGE := $(REGISTRY)/$(BIN)
-
-# This version-strategy uses git tags to set the version string
-VERSION := $(shell go run ./cmd/git-describe-semver --drop-prefix v)
+VERSION := test
 
 MAIN := ./cmd/git-describe-semver
 TEST := ./cmd/git-describe-semver ./internal
