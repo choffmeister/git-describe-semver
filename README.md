@@ -19,14 +19,6 @@ none | fail | `v0.0.0-dev.23.gabc1234`
 * Flag `--prerelease-suffix`: Adds a dash-separated suffix to the prerelease part
 * Flag `--format`: Changes output (use `<version>` as placeholder)
 
-### Binary
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/choffmeister/git-describe-semver/main/install.sh)"
-cd ~/my-git-directory
-~/bin/git-describe-semver
-```
-
 ### Docker
 
 ```bash
