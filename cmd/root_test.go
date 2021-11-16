@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"io/ioutil"
@@ -14,24 +14,24 @@ func TestRun(t *testing.T) {
 	assert := assert.New(t)
 	dir, _ := ioutil.TempDir("", "example")
 	author := object.Signature{Name: "Test", Email: "test@test.com"}
-	_, err := Run(dir, internal.GenerateVersionOptions{})
+	_, err := run(dir, internal.GenerateVersionOptions{})
 	assert.Error(err)
 
 	repo, _ := git.PlainInit(dir, false)
 	worktree, _ := repo.Worktree()
-	_, err = Run(dir, internal.GenerateVersionOptions{})
+	_, err = run(dir, internal.GenerateVersionOptions{})
 	assert.Error(err)
 
 	commit1, _ := worktree.Commit("first", &git.CommitOptions{Author: &author})
 	repo.CreateTag("invalid", commit1, nil)
-	_, err = Run(dir, internal.GenerateVersionOptions{})
+	_, err = run(dir, internal.GenerateVersionOptions{})
 	assert.Error(err)
 
 	commit2, _ := worktree.Commit("first", &git.CommitOptions{Author: &author})
 	repo.CreateTag("v1.0.0", commit2, nil)
 
 	commit3, _ := worktree.Commit("second", &git.CommitOptions{Author: &author})
-	result, err := Run(dir, internal.GenerateVersionOptions{})
+	result, err := run(dir, internal.GenerateVersionOptions{})
 	assert.NoError(err)
 	assert.Equal("v1.0.1-dev.1.g"+commit3.String()[0:7], *result)
 }

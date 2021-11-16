@@ -1,7 +1,7 @@
 .PHONY: *
 
 MAIN := .
-TEST := . ./internal
+TEST := ./cmd ./internal
 
 run:
 	go run $(MAIN)
