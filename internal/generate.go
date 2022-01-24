@@ -11,8 +11,8 @@ type GenerateVersionOptions struct {
 	FallbackTagName   string
 	DropTagNamePrefix bool
 	PrereleaseSuffix  string
-	Format            string
 	PrereleasePrefix  string
+	Format            string
 }
 
 // GenerateVersion ...

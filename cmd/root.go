@@ -42,8 +42,8 @@ func Execute(version FullVersion) error {
 		FallbackTagName:   *fallbackFlag,
 		DropTagNamePrefix: *dropPrefixFlag,
 		PrereleaseSuffix:  *prereleaseSuffixFlag,
-		Format:            *formatFlag,
 		PrereleasePrefix:  *prereleasePrefixFlag,
+		Format:            *formatFlag,
 	}
 	result, err := run(dir, opts)
 	if err != nil {
