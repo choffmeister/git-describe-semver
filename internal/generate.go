@@ -11,12 +11,13 @@ type GenerateVersionOptions struct {
 	FallbackTagName   string
 	DropTagNamePrefix bool
 	PrereleaseSuffix  string
+	PrereleasePrefix  string
 	Format            string
 }
 
 // GenerateVersion ...
 func GenerateVersion(tagName string, counter int, headHash string, opts GenerateVersionOptions) (*string, error) {
-	devPrerelease := []string{"dev", strconv.Itoa(counter), "g" + (headHash)[0:7]}
+	devPrerelease := []string{opts.PrereleasePrefix, strconv.Itoa(counter), "g" + (headHash)[0:7]}
 	if opts.PrereleaseSuffix != "" {
 		devPrerelease[len(devPrerelease)-1] = devPrerelease[len(devPrerelease)-1] + "-" + opts.PrereleaseSuffix
 	}
