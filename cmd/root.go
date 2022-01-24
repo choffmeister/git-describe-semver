@@ -30,6 +30,7 @@ func Execute(version FullVersion) error {
 	fallbackFlag := flag.String("fallback", "", "The first version to fallback to should there be no tag")
 	dropPrefixFlag := flag.Bool("drop-prefix", false, "Drop prefix from output")
 	prereleaseSuffixFlag := flag.String("prerelease-suffix", "", "Suffix to add to prereleases")
+	prereleasePrefixFlag := flag.String("prerelease-prefix", "dev", "Prefix to use as start of prerelease (default to \"dev\"))")
 	formatFlag := flag.String("format", "", "Format of output")
 	flag.Parse()
 
@@ -42,6 +43,7 @@ func Execute(version FullVersion) error {
 		DropTagNamePrefix: *dropPrefixFlag,
 		PrereleaseSuffix:  *prereleaseSuffixFlag,
 		Format:            *formatFlag,
+		PrereleasePrefix:  *prereleasePrefixFlag,
 	}
 	result, err := run(dir, opts)
 	if err != nil {
