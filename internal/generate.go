@@ -4,20 +4,35 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // GenerateVersionOptions ...
 type GenerateVersionOptions struct {
-	FallbackTagName   string
-	DropTagNamePrefix bool
-	PrereleaseSuffix  string
-	PrereleasePrefix  string
-	Format            string
+	FallbackTagName       string
+	DropTagNamePrefix     bool
+	PrereleaseSuffix      string
+	PrereleasePrefix      string
+	PrereleaseTimestamped bool
+	Format                string
 }
 
 // GenerateVersion ...
-func GenerateVersion(tagName string, counter int, headHash string, opts GenerateVersionOptions) (*string, error) {
+func GenerateVersion(tagName string, counter int, headHash string, timestamp time.Time, opts GenerateVersionOptions) (*string, error) {
 	devPrerelease := []string{opts.PrereleasePrefix, strconv.Itoa(counter), "g" + (headHash)[0:7]}
+	if opts.PrereleaseTimestamped {
+		timestampUTC := timestamp.UTC()
+		timestampSegments := []string{
+			fmt.Sprintf("%04d", timestampUTC.Year()),
+			fmt.Sprintf("%02d", timestampUTC.Month()),
+			fmt.Sprintf("%02d", timestampUTC.Day()),
+			fmt.Sprintf("%02d", timestampUTC.Hour()),
+			fmt.Sprintf("%02d", timestampUTC.Minute()),
+			fmt.Sprintf("%02d", timestampUTC.Second()),
+			fmt.Sprintf("%03d", timestampUTC.UnixMilli()%1000),
+		}
+		devPrerelease = []string{opts.PrereleasePrefix, strings.Join(timestampSegments, ""), "g" + (headHash)[0:7]}
+	}
 	if opts.PrereleaseSuffix != "" {
 		devPrerelease[len(devPrerelease)-1] = devPrerelease[len(devPrerelease)-1] + "-" + opts.PrereleaseSuffix
 	}

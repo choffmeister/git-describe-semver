@@ -2,14 +2,16 @@ package internal
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGenerateVersion(t *testing.T) {
+	now, _ := time.Parse(time.RFC822Z, "01 Jan 20 02:03 -0000")
 	assert := assert.New(t)
 	test := func(inputTagName string, inputCounter int, inputHeadHash string, inputOpts GenerateVersionOptions, expected string) {
-		actual, err := GenerateVersion(inputTagName, inputCounter, inputHeadHash, inputOpts)
+		actual, err := GenerateVersion(inputTagName, inputCounter, inputHeadHash, now, inputOpts)
 		if assert.NoError(err) {
 			assert.Equal(expected, *actual)
 		}
@@ -36,6 +38,9 @@ func TestGenerateVersion(t *testing.T) {
 	test("0.0.0", 0, "abc1234", GenerateVersionOptions{PrereleasePrefix: "custom"}, "0.0.0")
 	test("0.0.0", 1, "abc1234", GenerateVersionOptions{PrereleasePrefix: "custom"}, "0.0.1-custom.1.gabc1234")
 
-	_, err := GenerateVersion("", 1, "abc1234", GenerateVersionOptions{PrereleasePrefix: "dev"})
+	test("0.0.0", 0, "abc1234", GenerateVersionOptions{PrereleasePrefix: "dev", PrereleaseTimestamped: true}, "0.0.0")
+	test("0.0.0", 1, "abc1234", GenerateVersionOptions{PrereleasePrefix: "dev", PrereleaseTimestamped: true}, "0.0.1-dev.20200101020300000.gabc1234")
+
+	_, err := GenerateVersion("", 1, "abc1234", now, GenerateVersionOptions{PrereleasePrefix: "dev"})
 	assert.Error(err)
 }

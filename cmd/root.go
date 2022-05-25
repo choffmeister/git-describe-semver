@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
+	"time"
 
 	"github.com/choffmeister/git-describe-semver/internal"
 	"github.com/go-git/go-git/v5"
@@ -19,7 +20,7 @@ func run(dir string, opts internal.GenerateVersionOptions) (*string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to describe commit: %v", err)
 	}
-	result, err := internal.GenerateVersion(*tagName, *counter, *headHash, opts)
+	result, err := internal.GenerateVersion(*tagName, *counter, *headHash, time.Now(), opts)
 	if err != nil {
 		return nil, fmt.Errorf("unable to generate version: %v", err)
 	}
@@ -31,6 +32,7 @@ func Execute(version FullVersion) error {
 	dropPrefixFlag := flag.Bool("drop-prefix", false, "Drop prefix from output")
 	prereleaseSuffixFlag := flag.String("prerelease-suffix", "", "Suffix to add to prereleases")
 	prereleasePrefixFlag := flag.String("prerelease-prefix", "dev", "Prefix to use as start of prerelease (default to \"dev\"))")
+	prereleaseTimestampedFlag := flag.Bool("prerelease-timestamped", false, "Use timestamp instead of commit count for prerelease")
 	formatFlag := flag.String("format", "", "Format of output")
 	flag.Parse()
 
@@ -39,11 +41,12 @@ func Execute(version FullVersion) error {
 		return err
 	}
 	opts := internal.GenerateVersionOptions{
-		FallbackTagName:   *fallbackFlag,
-		DropTagNamePrefix: *dropPrefixFlag,
-		PrereleaseSuffix:  *prereleaseSuffixFlag,
-		PrereleasePrefix:  *prereleasePrefixFlag,
-		Format:            *formatFlag,
+		FallbackTagName:       *fallbackFlag,
+		DropTagNamePrefix:     *dropPrefixFlag,
+		PrereleaseSuffix:      *prereleaseSuffixFlag,
+		PrereleasePrefix:      *prereleasePrefixFlag,
+		PrereleaseTimestamped: *prereleaseTimestampedFlag,
+		Format:                *formatFlag,
 	}
 	result, err := run(dir, opts)
 	if err != nil {

@@ -1,19 +1,16 @@
 .PHONY: *
 
-MAIN := .
-TEST := ./cmd ./internal
-
 run:
-	go run $(MAIN)
+	go run .
 
 test:
-	go test -v $(TEST)
+	go test -v ./...
 
 test-watch:
-	watch -n1 go test -v $(TEST)
+	watch -n1 go test -v ./...
 
 test-cover:
-	go test -coverprofile=coverage.out $(TEST)
+	go test -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out
 	go tool cover -html=coverage.out
 
