@@ -23,13 +23,7 @@ func GenerateVersion(tagName string, counter int, headHash string, timestamp tim
 	if opts.PrereleaseTimestamped {
 		timestampUTC := timestamp.UTC()
 		timestampSegments := []string{
-			fmt.Sprintf("%04d", timestampUTC.Year()),
-			fmt.Sprintf("%02d", timestampUTC.Month()),
-			fmt.Sprintf("%02d", timestampUTC.Day()),
-			fmt.Sprintf("%02d", timestampUTC.Hour()),
-			fmt.Sprintf("%02d", timestampUTC.Minute()),
-			fmt.Sprintf("%02d", timestampUTC.Second()),
-			fmt.Sprintf("%03d", timestampUTC.UnixMilli()%1000),
+			strconv.FormatInt(timestampUTC.UnixMilli()/1000, 10),
 		}
 		devPrerelease = []string{opts.PrereleasePrefix, strings.Join(timestampSegments, ""), "g" + (headHash)[0:7]}
 	}

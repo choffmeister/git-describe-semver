@@ -39,7 +39,8 @@ func TestGenerateVersion(t *testing.T) {
 	test("0.0.0", 1, "abc1234", GenerateVersionOptions{PrereleasePrefix: "custom"}, "0.0.1-custom.1.gabc1234")
 
 	test("0.0.0", 0, "abc1234", GenerateVersionOptions{PrereleasePrefix: "dev", PrereleaseTimestamped: true}, "0.0.0")
-	test("0.0.0", 1, "abc1234", GenerateVersionOptions{PrereleasePrefix: "dev", PrereleaseTimestamped: true}, "0.0.1-dev.20200101020300000.gabc1234")
+	test("0.0.0", 1, "abc1234", GenerateVersionOptions{PrereleasePrefix: "dev", PrereleaseTimestamped: false}, "0.0.1-dev.1.gabc1234")
+	test("0.0.0", 1, "abc1234", GenerateVersionOptions{PrereleasePrefix: "dev", PrereleaseTimestamped: true}, "0.0.1-dev.1577844180.gabc1234")
 
 	_, err := GenerateVersion("", 1, "abc1234", now, GenerateVersionOptions{PrereleasePrefix: "dev"})
 	assert.Error(err)
