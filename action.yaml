@@ -4,12 +4,18 @@ inputs:
   fallback:
     description: 'fallback'
     default: 'v0.0.0'
+  drop-prefix:
+    description: 'drop-prefix'
+    default: 'false'
   prerelease-prefix:
     description: 'prerelease-suffix'
     default: 'dev'
   prerelease-suffix:
     description: 'prerelease-suffix'
     default: ''
+  prerelease-timestamped:
+    description: 'prerelease-timestamped'
+    default: 'false'
 outputs:
   version:
     description: 'version'
@@ -21,9 +27,10 @@ runs:
       id: git-describe-semver
       with:
         args: >-
-          --drop-prefix
           --fallback="${{ inputs.fallback }}"
+          --drop-prefix="${{ inputs.drop-prefix }}"
           --prerelease-prefix="${{ inputs.prerelease-prefix }}"
           --prerelease-suffix="${{ inputs.prerelease-suffix }}"
+          --prerelease-timestamped="${{ inputs.prerelease-timestamped }}"
           --format="version=<version>"
           $GITHUB_OUTPUT

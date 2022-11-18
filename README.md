@@ -43,7 +43,9 @@ jobs:
       uses: choffmeister/git-describe-semver@action
       with:
         fallback: v0.0.0
+        drop-prefix: true
         prerelease-prefix: dev
         prerelease-suffix: SNAPSHOT
+        prerelease-timestamped: true
     - run: echo This is the version ${{ steps.git-describe-semver.outputs.version }}
 ```
