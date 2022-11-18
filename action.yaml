@@ -17,8 +17,6 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - run: ls -al $GITHUB_OUTPUT
-      shell: bash
     - uses: docker://ghcr.io/choffmeister/git-describe-semver:latest
       id: git-describe-semver
       with:
