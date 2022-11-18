@@ -17,6 +17,10 @@ func GitTagMap(repo git.Repository) (*map[string]string, error) {
 	tagMap := map[string]string{}
 	err = iter.ForEach(func(r *plumbing.Reference) error {
 		tag, _ := repo.TagObject(r.Hash())
+		if SemVerParse(r.Name().Short()) == nil {
+			// Filter out tags that are not semver
+			return nil
+		}
 		if tag == nil {
 			tagMap[r.Hash().String()] = r.Name().Short()
 		} else {

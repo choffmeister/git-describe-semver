@@ -43,6 +43,21 @@ func TestGitTagMap(t *testing.T) {
 		commit1.String(): "v1.0.0",
 		commit2.String(): "v2.0.0",
 	}, *tags)
+
+	commit3, _ := worktree.Commit("third", &git.CommitOptions{Author: &author})
+	tag3, _ := repo.CreateTag("fum", commit3, &git.CreateTagOptions{
+		Tagger: &object.Signature{
+			Name:  "Fum",
+			Email: "fum@example.com",
+		},
+		Message: "Not a semver version tag",
+	})
+	assert.NotEqual(commit3.String(), tag3.Hash().String())
+	tags, _ = GitTagMap(*repo)
+	assert.Equal(map[string]string{
+		commit1.String(): "v1.0.0",
+		commit2.String(): "v2.0.0",
+	}, *tags)
 }
 
 func TestGitDescribe(t *testing.T) {
