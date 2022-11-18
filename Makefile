@@ -15,7 +15,7 @@ test-cover:
 	go tool cover -html=coverage.out
 
 build:
-	goreleaser build --rm-dist --snapshot
+	goreleaser release --rm-dist --skip-publish --snapshot
 
 release:
 	goreleaser release --rm-dist

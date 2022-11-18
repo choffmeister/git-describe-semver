@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"runtime/debug"
+	"strings"
 	"time"
 
 	"github.com/choffmeister/git-describe-semver/internal"
@@ -63,7 +64,12 @@ func Execute(version FullVersion) error {
 
 	file := "-"
 	if len(flag.Args()) == 1 {
-		file = flag.Args()[0]
+		arg := flag.Args()[0]
+		if strings.HasPrefix(arg, "$") {
+			file = os.Getenv(strings.TrimPrefix(arg, "$"))
+		} else {
+			file = arg
+		}
 	}
 	output, err := openStdoutOrFile(file)
 	if err != nil {

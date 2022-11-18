@@ -15,5 +15,23 @@ jobs:
     - uses: actions/setup-go@v2
       with:
         go-version: 1.17.x
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: go test ./...
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - id: git-describe-semver
+      uses: choffmeister/git-describe-semver@main
+      with:
+        fallback: v0.0.0-init
+        prerelease-prefix: prefix
+        prerelease-suffix: suffix
+    - name: Verify output
+      run: |
+        if [[ -z "${{ steps.git-describe-semver.outputs.version }}" ]]; then
+          echo Output version is empty!
+          exit 1
+        fi

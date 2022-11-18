@@ -36,12 +36,14 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - uses: docker://ghcr.io/choffmeister/git-describe-semver
-      id: git_describe_semver
+    - id: git-describe-semver
+      uses: choffmeister/git-describe-semver@action
       with:
-        args: --fallback v0.0.0 --drop-prefix --format "::set-output name=version::<version>"
-    - run: echo This is the version ${{ steps.git_describe_semver.outputs.version }}
+        fallback: v0.0.0
+        prerelease-prefix: dev
+        prerelease-suffix: SNAPSHOT
+    - run: echo This is the version ${{ steps.git-describe-semver.outputs.version }}
 ```

@@ -1,0 +1,31 @@
+name: 'Git describe semver'
+description: ''
+inputs:
+  fallback:
+    description: 'fallback'
+    default: 'v0.0.0'
+  prerelease-prefix:
+    description: 'prerelease-suffix'
+    default: 'dev'
+  prerelease-suffix:
+    description: 'prerelease-suffix'
+    default: ''
+outputs:
+  version:
+    description: 'version'
+    value: ${{ steps.git-describe-semver.outputs.version }}
+runs:
+  using: 'composite'
+  steps:
+    - run: ls -al $GITHUB_OUTPUT
+      shell: bash
+    - uses: docker://ghcr.io/choffmeister/git-describe-semver:latest
+      id: git-describe-semver
+      with:
+        args: >-
+          --drop-prefix
+          --fallback="${{ inputs.fallback }}"
+          --prerelease-prefix="${{ inputs.prerelease-prefix }}"
+          --prerelease-suffix="${{ inputs.prerelease-suffix }}"
+          --format="version=<version>"
+          $GITHUB_OUTPUT
