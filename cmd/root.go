@@ -3,6 +3,7 @@ package cmd
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"runtime/debug"
 	"time"
@@ -25,6 +26,13 @@ func run(dir string, opts internal.GenerateVersionOptions) (*string, error) {
 		return nil, fmt.Errorf("unable to generate version: %v", err)
 	}
 	return result, nil
+}
+
+func openStdoutOrFile(file string) (io.WriteCloser, error) {
+	if file == "-" {
+		return os.Stdout, nil
+	}
+	return os.OpenFile(file, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
 }
 
 func Execute(version FullVersion) error {
@@ -52,7 +60,17 @@ func Execute(version FullVersion) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(*result)
+
+	file := "-"
+	if len(flag.Args()) == 1 {
+		file = flag.Args()[0]
+	}
+	output, err := openStdoutOrFile(file)
+	if err != nil {
+		return err
+	}
+	defer output.Close()
+	fmt.Fprintf(output, "%s\n", *result)
 
 	return nil
 }
