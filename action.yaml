@@ -34,3 +34,5 @@ runs:
           --prerelease-timestamped="${{ inputs.prerelease-timestamped }}"
           --format="version=<version>"
           $GITHUB_OUTPUT
+    - run: echo ${{ steps.git-describe-semver.outputs.version }}
+      shell: bash
