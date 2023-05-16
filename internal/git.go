@@ -56,7 +56,7 @@ func GitDescribe(repo git.Repository) (*string, *int, *string, error) {
 	}
 	commits, err := repo.Log(&git.LogOptions{
 		From:  head.Hash(),
-		Order: git.LogOrderBSF,
+		Order: git.LogOrderCommitterTime,
 	})
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("unable to get log: %v", err)
