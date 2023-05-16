@@ -43,6 +43,8 @@ jobs:
     - id: git-describe-semver
       uses: choffmeister/git-describe-semver@action
       with:
+        version: latest
+        dir: .
         fallback: v0.0.0
         drop-prefix: true
         prerelease-prefix: dev

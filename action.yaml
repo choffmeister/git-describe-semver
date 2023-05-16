@@ -1,6 +1,12 @@
 name: 'Git describe semver'
 description: ''
 inputs:
+  version:
+    description: 'version'
+    default: 'latest'
+  dir:
+    description: 'dir'
+    default: '.'
   fallback:
     description: 'fallback'
     default: 'v0.0.0'
@@ -23,16 +29,32 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - uses: docker://ghcr.io/choffmeister/git-describe-semver:latest
-      id: git-describe-semver
-      with:
-        args: >-
-          --fallback="${{ inputs.fallback }}"
-          --drop-prefix="${{ inputs.drop-prefix }}"
-          --prerelease-prefix="${{ inputs.prerelease-prefix }}"
-          --prerelease-suffix="${{ inputs.prerelease-suffix }}"
-          --prerelease-timestamped="${{ inputs.prerelease-timestamped }}"
-          --format="version=<version>"
+    - if: inputs.version == 'latest'
+      run: |
+        cd /tmp
+        URL=$(curl -fsSL https://api.github.com/repos/choffmeister/git-describe-semver/releases/latest | jq -r '.assets[] | select(.name|test("linux_amd64\\.tar\\.gz$")) | .browser_download_url')
+        curl -fsSL "$URL" | tar xz
+        mv git-describe-semver /usr/local/bin
+      shell: bash
+    - if: inputs.version != 'latest'
+      run: |
+        cd /tmp
+        VERSION="$(echo ${{ inputs.version }} | sed 's#^v##')"
+        URL="https://github.com/choffmeister/git-describe-semver/releases/download/v${VERSION}/git-describe-semver_${VERSION}_linux_amd64.tar.gz"
+        curl -fsSL "$URL" | tar xz
+        mv git-describe-semver /usr/local/bin
+      shell: bash
+    - id: git-describe-semver
+      run: |
+        git-describe-semver \
+          --dir="${{ inputs.dir }}" \
+          --fallback="${{ inputs.fallback }}" \
+          --drop-prefix="${{ inputs.drop-prefix }}" \
+          --prerelease-prefix="${{ inputs.prerelease-prefix }}" \
+          --prerelease-suffix="${{ inputs.prerelease-suffix }}" \
+          --prerelease-timestamped="${{ inputs.prerelease-timestamped }}" \
+          --format="version=<version>" \
           $GITHUB_OUTPUT
+      shell: bash
     - run: echo ${{ steps.git-describe-semver.outputs.version }}
       shell: bash
