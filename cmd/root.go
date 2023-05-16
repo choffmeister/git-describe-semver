@@ -37,6 +37,7 @@ func openStdoutOrFile(file string) (io.WriteCloser, error) {
 }
 
 func Execute(version FullVersion) error {
+	dirFlag := flag.String("dir", ".", "The git worktree directory")
 	fallbackFlag := flag.String("fallback", "", "The first version to fallback to should there be no tag")
 	dropPrefixFlag := flag.Bool("drop-prefix", false, "Drop prefix from output")
 	prereleaseSuffixFlag := flag.String("prerelease-suffix", "", "Suffix to add to prereleases")
@@ -45,10 +46,6 @@ func Execute(version FullVersion) error {
 	formatFlag := flag.String("format", "", "Format of output")
 	flag.Parse()
 
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
 	opts := internal.GenerateVersionOptions{
 		FallbackTagName:       *fallbackFlag,
 		DropTagNamePrefix:     *dropPrefixFlag,
@@ -57,7 +54,7 @@ func Execute(version FullVersion) error {
 		PrereleaseTimestamped: *prereleaseTimestampedFlag,
 		Format:                *formatFlag,
 	}
-	result, err := run(dir, opts)
+	result, err := run(*dirFlag, opts)
 	if err != nil {
 		return err
 	}

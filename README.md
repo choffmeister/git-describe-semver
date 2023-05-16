@@ -14,6 +14,7 @@ none | fail | `v0.0.0-dev.23.gabc1234`
 
 ## Usage
 
+* Flag `--dir /some/git/worktree`: Git worktree directory (defaults to current directory)
 * Flag `--fallback v0.0.0`: Fallback to given tag name if no tag is available
 * Flag `--drop-prefix`: Drop any present prefix (like `v`) from the output
 * Flag `--prerelease-suffix`: Adds a dash-separated suffix to the prerelease part
