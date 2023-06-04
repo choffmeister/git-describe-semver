@@ -28,14 +28,38 @@ func (v SemVer) Equal(v2 SemVer) bool {
 		equalStringSlice(v.BuildMetadata, v2.BuildMetadata)
 }
 
+func (v SemVer) Version(nextRelease string) string {
+	patch := v.Patch
+	isPrerelease := len(v.Prerelease) > 0
+	if nextRelease == "patch" && !isPrerelease {
+		patch++
+	}
+	minor := v.Minor
+	if nextRelease == "minor" {
+		if v.Patch != 0 || !isPrerelease {
+			minor++
+		}
+		patch = 0
+	}
+	major := v.Major
+	if nextRelease == "major" {
+		if v.Patch != 0 || !isPrerelease {
+			major++
+		}
+		minor = 0
+		patch = 0
+	}
+	return fmt.Sprintf("%s%d.%d.%d", v.Prefix, major, minor, patch)
+}
+
 // String ...
 func (v SemVer) String() string {
-	str := fmt.Sprintf("%s%d.%d.%d", v.Prefix, v.Major, v.Minor, v.Patch)
+	str := v.Version("")
 	if len(v.Prerelease) > 0 {
-		str = str + "-" + strings.Join(v.Prerelease, ".")
+		str += "-" + strings.Join(v.Prerelease, ".")
 	}
 	if len(v.BuildMetadata) > 0 {
-		str = str + "+" + strings.Join(v.BuildMetadata, ".")
+		str += "+" + strings.Join(v.BuildMetadata, ".")
 	}
 	return str
 }

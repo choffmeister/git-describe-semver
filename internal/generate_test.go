@@ -24,6 +24,21 @@ func TestGenerateVersion(t *testing.T) {
 	test("0.0.0-rc.1+foobar", 1, "abc1234", GenerateVersionOptions{PrereleasePrefix: "dev"}, "0.0.0-rc.1.dev.1.gabc1234+foobar")
 	test("v0.0.0-rc.1+foobar", 1, "abc1234", GenerateVersionOptions{PrereleasePrefix: "dev"}, "v0.0.0-rc.1.dev.1.gabc1234+foobar")
 
+	test("", 1, "abc1234", GenerateVersionOptions{FallbackTagName: "v0.0.0", NextRelease: "patch"}, "v0.0.0")
+	test("", 1, "abc1234", GenerateVersionOptions{FallbackTagName: "v0.0.0", NextRelease: "minor"}, "v0.0.0")
+	test("", 1, "abc1234", GenerateVersionOptions{FallbackTagName: "v0.0.0", NextRelease: "major"}, "v0.0.0")
+	test("v0.0.0-rc.1+foobar", 1, "abc1234", GenerateVersionOptions{NextRelease: "patch"}, "v0.0.0")
+	test("v0.0.1+foobar", 1, "abc1234", GenerateVersionOptions{NextRelease: "patch"}, "v0.0.2")
+	test("v1.2.3", 1, "abc1234", GenerateVersionOptions{NextRelease: "patch"}, "v1.2.4")
+	test("v0.1.0-rc1", 1, "abc1234", GenerateVersionOptions{NextRelease: "minor"}, "v0.1.0")
+	test("v0.1.0", 1, "abc1234", GenerateVersionOptions{NextRelease: "minor", DropTagNamePrefix: true}, "0.2.0")
+	test("v0.1.1-rc1", 1, "abc1234", GenerateVersionOptions{NextRelease: "minor"}, "v0.2.0")
+	test("v1.2.3", 1, "abc1234", GenerateVersionOptions{NextRelease: "minor"}, "v1.3.0")
+	test("v1.0.0-rc1", 1, "abc1234", GenerateVersionOptions{NextRelease: "major"}, "v1.0.0")
+	test("v1.0.0", 1, "abc1234", GenerateVersionOptions{NextRelease: "major"}, "v2.0.0")
+	test("v1.0.1-rc1", 1, "abc1234", GenerateVersionOptions{NextRelease: "major"}, "v2.0.0")
+	test("v1.2.3", 1, "abc1234", GenerateVersionOptions{NextRelease: "major", Format: "v<version>", DropTagNamePrefix: true}, "v2.0.0")
+
 	test("", 1, "abc1234", GenerateVersionOptions{FallbackTagName: "0.0.0", PrereleasePrefix: "dev"}, "0.0.0-dev.1.gabc1234")
 	test("", 1, "abc1234", GenerateVersionOptions{FallbackTagName: "v0.0.0", PrereleasePrefix: "dev"}, "v0.0.0-dev.1.gabc1234")
 
