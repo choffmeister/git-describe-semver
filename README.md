@@ -41,7 +41,7 @@ jobs:
       with:
         fetch-depth: 0
     - id: git-describe-semver
-      uses: choffmeister/git-describe-semver@action
+      uses: choffmeister/git-describe-semver@main
       with:
         version: latest
         dir: .
