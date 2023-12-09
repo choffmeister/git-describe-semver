@@ -1,11 +1,23 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+)
+
+const (
+	// Prefix found in .git files that point to another location
+	GitDirPrefix = "gitdir: "
+
+	GitDirName    = ".git"
+	CommonDirName = "commondir"
 )
 
 // GitTagMap ...
@@ -102,4 +114,57 @@ func GitDescribe(repo git.Repository) (*string, *int, *string, error) {
 	}
 	tagName := (*tags)[tagHash]
 	return &tagName, &counter, &headHash, nil
+}
+
+func OpenRepository(dir string) (*git.Repository, error) {
+	gitDir, err := FindGitDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	enableCommonDir, err := shouldEnableCommondDir(gitDir)
+	if err != nil {
+		return nil, err
+	}
+	openOpts := &git.PlainOpenOptions{EnableDotGitCommonDir: enableCommonDir}
+	return git.PlainOpenWithOptions(dir, openOpts)
+}
+
+func shouldEnableCommondDir(gitDir string) (bool, error) {
+	cdPath := filepath.Join(gitDir, CommonDirName)
+	st, err := os.Stat(cdPath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return false, nil
+		}
+		return false, err
+	}
+	if st.IsDir() {
+		return false, fmt.Errorf("expected to be a file, not directory: %s", cdPath)
+	}
+	return true, nil
+}
+
+func FindGitDir(dir string) (string, error) {
+	gitDirPath := filepath.Join(dir, GitDirName)
+	st, err := os.Stat(gitDirPath)
+	if err != nil {
+		return "", err
+	}
+	if st.IsDir() {
+		return gitDirPath, nil
+	}
+	// It is a file, read the contents
+	contents, err := os.ReadFile(gitDirPath)
+	if err != nil {
+		return "", err
+	}
+
+	line := string(contents)
+	if !strings.HasPrefix(line, GitDirPrefix) {
+		return "", fmt.Errorf(".git file has no %s prefix", GitDirPrefix)
+	}
+
+	gitdir := strings.Split(line[len(GitDirPrefix):], "\n")[0]
+	gitdir = strings.TrimSpace(gitdir)
+	return gitdir, nil
 }
