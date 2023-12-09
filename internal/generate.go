@@ -69,8 +69,7 @@ func GenerateVersion(tagName string, counter int, headHash string, timestamp tim
 	if opts.DropTagNamePrefix {
 		version.Prefix = ""
 	}
-	var result string
-	result = version.String()
+	result := version.String()
 	if opts.Format != "" {
 		result = strings.ReplaceAll(opts.Format, "<version>", result)
 	}
