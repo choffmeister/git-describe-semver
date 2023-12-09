@@ -14,7 +14,7 @@ type GenerateVersionOptions struct {
 	PrereleaseSuffix      string
 	PrereleasePrefix      string
 	PrereleaseTimestamped bool
-	NextRelease 	      string
+	NextRelease           string
 	Format                string
 }
 
@@ -65,15 +65,12 @@ func GenerateVersion(tagName string, counter int, headHash string, timestamp tim
 			}
 		}
 	}
+	version = version.Bump(opts.NextRelease)
 	if opts.DropTagNamePrefix {
 		version.Prefix = ""
 	}
 	var result string
-	if opts.NextRelease != "" {
-		result = version.Version(opts.NextRelease)
-	} else {
-		result = version.String()
-	}
+	result = version.String()
 	if opts.Format != "" {
 		result = strings.ReplaceAll(opts.Format, "<version>", result)
 	}
