@@ -28,6 +28,38 @@ func (v SemVer) Equal(v2 SemVer) bool {
 		equalStringSlice(v.BuildMetadata, v2.BuildMetadata)
 }
 
+// Bump ...
+func (v *SemVer) Bump(nextRelease string) {
+	if nextRelease == "" {
+		return
+	}
+	isPrerelease := len(v.Prerelease) > 0
+	patch := v.Patch
+	if nextRelease == "patch" && !isPrerelease {
+		patch++
+	}
+	minor := v.Minor
+	if nextRelease == "minor" {
+		if v.Patch != 0 || !isPrerelease {
+			minor++
+		}
+		patch = 0
+	}
+	major := v.Major
+	if nextRelease == "major" {
+		if v.Patch != 0 || !isPrerelease {
+			major++
+		}
+		minor = 0
+		patch = 0
+	}
+	v.Major = major
+	v.Minor = minor
+	v.Patch = patch
+	v.Prerelease = []string{}
+	v.BuildMetadata = []string{}
+}
+
 // String ...
 func (v SemVer) String() string {
 	str := fmt.Sprintf("%s%d.%d.%d", v.Prefix, v.Major, v.Minor, v.Patch)

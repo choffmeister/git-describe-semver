@@ -2,29 +2,32 @@ name: 'Git describe semver'
 description: ''
 inputs:
   version:
-    description: 'version'
+    description: 'Which git-describe-semver release should be used?'
     default: 'latest'
   dir:
-    description: 'dir'
+    description: 'Git worktree directory (defaults to current directory)'
     default: '.'
   fallback:
-    description: 'fallback'
+    description: 'Fallback to given tag name if no tag is available'
     default: 'v0.0.0'
   drop-prefix:
-    description: 'drop-prefix'
+    description: 'Drop any present prefix (like "v") from the output'
     default: 'false'
   prerelease-prefix:
-    description: 'prerelease-suffix'
+    description: 'Adds a dash-separated prefix to the prerelease part'
     default: 'dev'
   prerelease-suffix:
-    description: 'prerelease-suffix'
+    description: 'Adds a dash-separated suffix to the prerelease part'
     default: ''
   prerelease-timestamped:
-    description: 'prerelease-timestamped'
+    description: 'Use timestamp instead of commit count for prerelease'
     default: 'false'
+  next-release:
+    description: 'Bump current version to next release (choices: "major", "minor", "patch")'
+    default: ''
 outputs:
   version:
-    description: 'version'
+    description: 'Version output from git-describe-semver'
     value: ${{ steps.git-describe-semver.outputs.version }}
 runs:
   using: 'composite'
@@ -53,6 +56,7 @@ runs:
           --prerelease-prefix="${{ inputs.prerelease-prefix }}" \
           --prerelease-suffix="${{ inputs.prerelease-suffix }}" \
           --prerelease-timestamped="${{ inputs.prerelease-timestamped }}" \
+          --next-release="${{ inputs.next-release }}" \
           --format="version=<version>" \
           $GITHUB_OUTPUT
       shell: bash

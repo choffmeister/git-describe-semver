@@ -4,20 +4,36 @@ Replacement for `git describe --tags` that produces [semver](https://semver.org/
 
 ## Comparison
 
-Previous git tag | git describe --tags | git-describe-semver --fallback v0.0.0
---- | --- | ---
-`v1.2.3` | `v1.2.3` | `v1.2.3`
-`v1.2.3` | `v1.2.3-23-gabc1234` | `v1.2.4-dev.23.gabc1234`
-`v1.3.0-rc.1` | `v1.3.0-rc.1-23-gabc1234` | `v1.3.0-rc.1.dev.23.gabc1234`
-`v1.3.0-rc.1+info` | `v1.3.0-rc.1+info-23-gabc1234` | `v1.3.0-rc.1.dev.23.gabc1234+info`
-none | fail | `v0.0.0-dev.23.gabc1234`
+| Previous git tag   | git describe --tags            | git-describe-semver --fallback v0.0.0 |
+|--------------------|--------------------------------|---------------------------------------|
+| `v1.2.3`           | `v1.2.3`                       | `v1.2.3`                              |
+| `v1.2.3`           | `v1.2.3-23-gabc1234`           | `v1.2.4-dev.23.gabc1234`              |
+| `v1.3.0-rc.1`      | `v1.3.0-rc.1-23-gabc1234`      | `v1.3.0-rc.1.dev.23.gabc1234`         |
+| `v1.3.0-rc.1+info` | `v1.3.0-rc.1+info-23-gabc1234` | `v1.3.0-rc.1.dev.23.gabc1234+info`    |
+| none               | fail                           | `v0.0.0-dev.23.gabc1234`              |
+
+## Next Release
+
+| Previous git tag | git describe --tags       | git-describe-semver --fallback v0.0.0 | --next-release        |
+|------------------|---------------------------|---------------------------------------|-----------------------|
+| `v1.2.3`         | `v1.2.3`                  | `v1.2.4`                              | patch                 |
+| `v1.2.3`         | `v1.2.3-23-gabc1234`      | `v1.2.4`                              | patch                 |
+| `v1.3.0-rc.1`    | `v1.3.0-rc.1-23-gabc1234` | `v1.3.0`                              | patch / minor         |
+| `v1.3.1-rc.1`    | `v1.3.1-rc.1-23-gabc1234` | `v1.4.0`                              | minor                 |
+| `v1.0.0-rc.1`    | `v1.0.0-rc.1-23-gabc1234` | `v1.0.0`                              | major                 |
+| `v1.0.0`         | `v1.0.0`                  | `v2.0.0`                              | major                 |
+| `v1.0.1-rc.1`    | `v1.0.1-rc.1-23-gabc1234` | `v2.0.0`                              | major                 |
+| none             | fail                      | `v0.0.0`                              | patch / minor / major |
 
 ## Usage
 
-* Flag `--dir /some/git/worktree`: Git worktree directory (defaults to current directory)
+* Flag `--dir /some/git/worktree`: Git worktree directory (defaults to current directory `.`)
 * Flag `--fallback v0.0.0`: Fallback to given tag name if no tag is available
 * Flag `--drop-prefix`: Drop any present prefix (like `v`) from the output
 * Flag `--prerelease-suffix`: Adds a dash-separated suffix to the prerelease part
+* Flag `--prerelease-prefix`: Adds a dash-separated prefix to the prerelease part (defaults to `dev`)
+* Flag `--prerelease-timestamped`: Use timestamp instead of commit count for prerelease
+* Flag `--next-release`: Bump current version to next release (choices: `major`, `minor`, `patch`)
 * Flag `--format`: Changes output (use `<version>` as placeholder)
 
 ### Docker
@@ -50,5 +66,6 @@ jobs:
         prerelease-prefix: dev
         prerelease-suffix: SNAPSHOT
         prerelease-timestamped: true
+        next-release: ''
     - run: echo This is the version ${{ steps.git-describe-semver.outputs.version }}
 ```
