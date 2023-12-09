@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/choffmeister/git-describe-semver/internal"
-	"github.com/go-git/go-git/v5"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -37,14 +36,14 @@ func openStdoutOrFile(file string) (io.WriteCloser, error) {
 }
 
 type ParserOptions struct {
-	Dir string `long:"dir" default:"." description:"The git worktree directory"`
-	Fallback string `long:"fallback" description:"The first version to fallback to should there be no tag"`
-	DropPrefix bool `long:"drop-prefix" description:"Drop prefix from output"`
-	PrereleaseSuffix string `long:"prerelease-suffix" description:"Suffix to add to prereleases"`
-	PrereleasePrefix string `long:"prerelease-prefix" default:"dev" description:"Prefix to use as start of prerelease"`
-	PrereleaseTimestamped bool `long:"prerelease-timestamped" description:"Use timestamp instead of commit count for prerelease"`
-	NextRelease string `long:"next-release" description:"Bump current version to next release" choice:"major" choice:"minor" choice:"patch"`
-	Format string `long:"format" description:"Format of output (use <version> as placeholder)"`
+	Dir                   string `long:"dir" default:"." description:"The git worktree directory"`
+	Fallback              string `long:"fallback" description:"The first version to fallback to should there be no tag"`
+	DropPrefix            bool   `long:"drop-prefix" description:"Drop prefix from output"`
+	PrereleaseSuffix      string `long:"prerelease-suffix" description:"Suffix to add to prereleases"`
+	PrereleasePrefix      string `long:"prerelease-prefix" default:"dev" description:"Prefix to use as start of prerelease"`
+	PrereleaseTimestamped bool   `long:"prerelease-timestamped" description:"Use timestamp instead of commit count for prerelease"`
+	NextRelease           string `long:"next-release" description:"Bump current version to next release" choice:"major" choice:"minor" choice:"patch"`
+	Format                string `long:"format" description:"Format of output (use <version> as placeholder)"`
 }
 
 func Execute(version FullVersion) error {
@@ -69,7 +68,7 @@ func Execute(version FullVersion) error {
 		PrereleaseSuffix:      options.PrereleaseSuffix,
 		PrereleasePrefix:      options.PrereleasePrefix,
 		PrereleaseTimestamped: options.PrereleaseTimestamped,
-		NextRelease: 		   options.NextRelease,
+		NextRelease:           options.NextRelease,
 		Format:                options.Format,
 	}
 	result, err := run(options.Dir, opts)
