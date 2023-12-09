@@ -22,6 +22,9 @@ inputs:
   prerelease-timestamped:
     description: 'Use timestamp instead of commit count for prerelease'
     default: 'false'
+  next-release:
+    description: 'Bump current version to next release (choices: "major", "minor", "patch")'
+    default: ''
 outputs:
   version:
     description: 'Version output from git-describe-semver'
@@ -47,12 +50,13 @@ runs:
     - id: git-describe-semver
       run: |
         git-describe-semver \
-          --dir="${{ inputs.dir }}" \
-          --fallback="${{ inputs.fallback }}" \
-          --drop-prefix="${{ inputs.drop-prefix }}" \
-          --prerelease-prefix="${{ inputs.prerelease-prefix }}" \
-          --prerelease-suffix="${{ inputs.prerelease-suffix }}" \
-          --prerelease-timestamped="${{ inputs.prerelease-timestamped }}" \
+          ${{ format('--dir="{0}"', inputs.dir) }} \
+          ${{ format('--fallback="{0}"', inputs.fallback) }} \
+          ${{ format('--drop-prefix="{0}"', inputs.drop-prefix) }} \
+          ${{ format('--prerelease-prefix="{0}"', inputs.prerelease-prefix) }} \
+          ${{ format('--prerelease-suffix="{0}"', inputs.prerelease-suffix) }} \
+          ${{ format('--prerelease-timestamped="{0}"', inputs.prerelease-timestamped) }} \
+          ${{ inputs.next-release != '' && format('--next-release="{0}"', inputs.next-release) || '' }} \
           --format="version=<version>" \
           $GITHUB_OUTPUT
       shell: bash
