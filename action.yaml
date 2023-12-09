@@ -52,10 +52,10 @@ runs:
         git-describe-semver \
           ${{ format('--dir="{0}"', inputs.dir) }} \
           ${{ format('--fallback="{0}"', inputs.fallback) }} \
-          ${{ format('--drop-prefix="{0}"', inputs.drop-prefix) }} \
+          ${{ inputs.drop-prefix == 'true' && format('--drop-prefix') || '' }} \
           ${{ format('--prerelease-prefix="{0}"', inputs.prerelease-prefix) }} \
           ${{ format('--prerelease-suffix="{0}"', inputs.prerelease-suffix) }} \
-          ${{ format('--prerelease-timestamped="{0}"', inputs.prerelease-timestamped) }} \
+          ${{ inputs.inputs.prerelease-timestamped == 'true' && format('--prerelease-timestamped') || '' }} \
           ${{ inputs.next-release != '' && format('--next-release="{0}"', inputs.next-release) || '' }} \
           --format="version=<version>" \
           $GITHUB_OUTPUT

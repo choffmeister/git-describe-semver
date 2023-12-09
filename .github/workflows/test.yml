@@ -61,3 +61,26 @@ jobs:
           echo Output version is empty!
           exit 1
         fi
+  test-action-0-4-0:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - id: git-describe-semver
+      uses: choffmeister/git-describe-semver@main
+      with:
+        version:  0.4.0
+        dir: .
+        fallback: v0.0.0-init
+        drop-prefix: true
+        prerelease-prefix: prefix
+        prerelease-suffix: suffix
+        prerelease-timestamped: true
+        next-release: major
+    - name: Verify output
+      run: |
+        if [[ -z "${{ steps.git-describe-semver.outputs.version }}" ]]; then
+          echo Output version is empty!
+          exit 1
+        fi
