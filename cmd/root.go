@@ -14,7 +14,7 @@ import (
 )
 
 func run(dir string, opts internal.GenerateVersionOptions) (*string, error) {
-	repo, err := git.PlainOpen(dir)
+	repo, err := internal.OpenRepository(dir)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open git repository: %v", err)
 	}

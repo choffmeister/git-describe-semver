@@ -2,6 +2,8 @@ package internal
 
 import (
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/go-git/go-git/v5"
@@ -126,4 +128,82 @@ func TestGitDescribeWithBranch(t *testing.T) {
 	test("v1.0.0", 2, commit4.String())
 	repo.CreateTag("v2.0.0", commit3, nil)
 	test("v2.0.0", 1, commit4.String())
+}
+
+func setUpDotGitDirTest(assert *assert.Assertions) (string, string) {
+	testDir, err := os.MkdirTemp("", "test")
+	assert.NoError(err, "failed to create temp dir")
+
+	gitDirPath := filepath.Join(testDir, GitDirName)
+	err = os.Mkdir(gitDirPath, 0750)
+	assert.NoError(err, "failed to create git dir")
+
+	return testDir, gitDirPath
+}
+
+func setUpDotGitFileTest(assert *assert.Assertions) (string, string, string) {
+	testDir, err := os.MkdirTemp("", "test")
+	assert.NoError(err, "failed to create temp dir")
+
+	actualDotGitPath := filepath.Join(testDir, "actual")
+	err = os.Mkdir(actualDotGitPath, 0750)
+	assert.NoError(err, "failed to create actual git dir")
+
+	wtPath := filepath.Join(testDir, "my_worktree")
+	err = os.Mkdir(wtPath, 0750)
+	assert.NoError(err, "failed to create worktree dir")
+
+	wtDotGitPath := filepath.Join(wtPath, GitDirName)
+	contents := GitDirPrefix + actualDotGitPath
+	err = os.WriteFile(wtDotGitPath, []byte(contents), 0666)
+	assert.NoError(err, "failed to write git dir file in worktree")
+
+	return testDir, actualDotGitPath, wtPath
+}
+
+func TestFindGitDir(t *testing.T) {
+	t.Run(".git is a directory", func(t *testing.T) {
+		assert := assert.New(t)
+		testDir, gitDirPath := setUpDotGitDirTest(assert)
+		defer os.RemoveAll(testDir)
+
+		result, err := FindGitDir(testDir)
+		assert.NoError(err, "failed to find git dir")
+		assert.Equal(gitDirPath, result)
+	})
+	t.Run(".git is a file pointing to another directory", func(t *testing.T) {
+		assert := assert.New(t)
+		testDir, actualDotGitPath, wtPath := setUpDotGitFileTest(assert)
+		defer os.RemoveAll(testDir)
+
+		result, err := FindGitDir(wtPath)
+		assert.NoError(err, "failed to find git dir in worktree")
+		assert.Equal(actualDotGitPath, result)
+	})
+}
+
+func TestShouldEnableCommonDir(t *testing.T) {
+	t.Run(".git is a directory", func(t *testing.T) {
+		assert := assert.New(t)
+		testDir, gitDirPath := setUpDotGitDirTest(assert)
+		defer os.RemoveAll(testDir)
+
+		result, err := shouldEnableCommondDir(gitDirPath)
+		assert.NoError(err, "failed evaluating whether to enable commond dir")
+		assert.False(result)
+	})
+	t.Run(".git is a file pointing to another directory", func(t *testing.T) {
+		assert := assert.New(t)
+		testDir, actualDotGitPath, _ := setUpDotGitFileTest(assert)
+		defer os.RemoveAll(testDir)
+
+		cdPath := filepath.Join(actualDotGitPath, CommonDirName)
+		contents := "../my_worktree"
+		err := os.WriteFile(cdPath, []byte(contents), 0666)
+		assert.NoError(err, "failed writing commondir file")
+
+		result, err := shouldEnableCommondDir(actualDotGitPath)
+		assert.NoError(err, "failed evaluating whether to enable commond dir")
+		assert.True(result)
+	})
 }
