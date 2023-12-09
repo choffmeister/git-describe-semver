@@ -65,7 +65,7 @@ func GenerateVersion(tagName string, counter int, headHash string, timestamp tim
 			}
 		}
 	}
-	version = version.Bump(opts.NextRelease)
+	version.Bump(opts.NextRelease)
 	if opts.DropTagNamePrefix {
 		version.Prefix = ""
 	}

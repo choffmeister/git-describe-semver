@@ -29,11 +29,10 @@ func (v SemVer) Equal(v2 SemVer) bool {
 }
 
 // Bump ...
-func (v SemVer) Bump(nextRelease string) *SemVer {
+func (v *SemVer) Bump(nextRelease string) {
 	if nextRelease == "" {
-		return &v
+		return
 	}
-
 	isPrerelease := len(v.Prerelease) > 0
 	patch := v.Patch
 	if nextRelease == "patch" && !isPrerelease {
@@ -54,13 +53,11 @@ func (v SemVer) Bump(nextRelease string) *SemVer {
 		minor = 0
 		patch = 0
 	}
-	v2 := SemVer{
-		Prefix: v.Prefix,
-		Major:  major,
-		Minor:  minor,
-		Patch:  patch,
-	}
-	return &v2
+	v.Major = major
+	v.Minor = minor
+	v.Patch = patch
+	v.Prerelease = []string{}
+	v.BuildMetadata = []string{}
 }
 
 // String ...
