@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"runtime/debug"
+	"strconv"
 	"strings"
 	"time"
 
@@ -46,10 +47,40 @@ type ParserOptions struct {
 	Format                string `long:"format" description:"Format of output (use <version> as placeholder)"`
 }
 
+// normalizeBoolArgs rewrites boolean flags that are given an explicit value
+// (such as --drop-prefix=false) into the bare switch form go-flags expects.
+// go-flags rejects boolean flags that carry a value, so flags set to false
+// are dropped (which matches their default) and flags set to true are kept.
+func normalizeBoolArgs(args []string) []string {
+	boolFlags := []string{
+		"drop-prefix",
+		"prerelease-timestamped",
+	}
+	result := make([]string, 0, len(args))
+	for _, arg := range args {
+		matched := false
+		for _, name := range boolFlags {
+			prefix := "--" + name + "="
+			if strings.HasPrefix(arg, prefix) {
+				matched = true
+				value := strings.TrimPrefix(arg, prefix)
+				if b, err := strconv.ParseBool(value); err == nil && b {
+					result = append(result, "--"+name)
+				}
+				break
+			}
+		}
+		if !matched {
+			result = append(result, arg)
+		}
+	}
+	return result
+}
+
 func Execute(version FullVersion) error {
 	var options ParserOptions
 	parser := flags.NewParser(&options, flags.Default)
-	args, err := parser.Parse()
+	args, err := parser.ParseArgs(normalizeBoolArgs(os.Args[1:]))
 	if err != nil {
 		switch flagsErr := err.(type) {
 		case flags.ErrorType:

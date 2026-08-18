@@ -35,3 +35,32 @@ func TestRun(t *testing.T) {
 	assert.NoError(err)
 	assert.Equal("v1.0.1-dev.1.g"+commit3.String()[0:7], *result)
 }
+
+func TestNormalizeBoolArgs(t *testing.T) {
+	assert := assert.New(t)
+	result := normalizeBoolArgs([]string{
+		"--dir=.",
+		"--fallback=0.0.0",
+		"--drop-prefix=false",
+		"--prerelease-timestamped=false",
+		"--prerelease-prefix=pre",
+		"--format=version=<version>",
+	})
+	assert.Equal([]string{
+		"--dir=.",
+		"--fallback=0.0.0",
+		"--prerelease-prefix=pre",
+		"--format=version=<version>",
+	}, result)
+
+	result = normalizeBoolArgs([]string{
+		"--drop-prefix=true",
+		"--prerelease-timestamped=1",
+		"--dir=.",
+	})
+	assert.Equal([]string{
+		"--drop-prefix",
+		"--prerelease-timestamped",
+		"--dir=.",
+	}, result)
+}
