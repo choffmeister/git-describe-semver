@@ -1,5 +1,6 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
 # Make sure to check the documentation at https://goreleaser.com
+version: 2
+
 before:
   hooks:
     - go mod tidy
@@ -42,7 +43,7 @@ docker_manifests:
 checksum:
   name_template: 'checksums.txt'
 snapshot:
-  name_template: "0.0.0-dev"
+  version_template: "0.0.0-dev"
 changelog:
   sort: asc
   filters:
