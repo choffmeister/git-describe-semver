@@ -79,8 +79,8 @@ func Execute(version FullVersion) error {
 	file := "-"
 	if len(args) == 1 {
 		arg := args[0]
-		if strings.HasPrefix(arg, "$") {
-			file = os.Getenv(strings.TrimPrefix(arg, "$"))
+		if after, ok := strings.CutPrefix(arg, "$"); ok {
+			file = os.Getenv(after)
 		} else {
 			file = arg
 		}

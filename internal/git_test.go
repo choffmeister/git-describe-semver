@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -15,7 +14,7 @@ import (
 
 func TestGitTagMap(t *testing.T) {
 	assert := assert.New(t)
-	dir, _ := ioutil.TempDir("", "example")
+	dir := t.TempDir()
 	author := object.Signature{Name: "Test", Email: "test@test.com"}
 	repo, _ := git.PlainInit(dir, false)
 	worktree, _ := repo.Worktree()
@@ -64,7 +63,7 @@ func TestGitTagMap(t *testing.T) {
 
 func TestGitDescribe(t *testing.T) {
 	assert := assert.New(t)
-	dir, _ := ioutil.TempDir("", "example")
+	dir := t.TempDir()
 	author := object.Signature{Name: "Test", Email: "test@test.com"}
 	repo, _ := git.PlainInit(dir, false)
 	worktree, _ := repo.Worktree()
@@ -96,7 +95,7 @@ func TestGitDescribe(t *testing.T) {
 
 func TestGitDescribeWithBranch(t *testing.T) {
 	assert := assert.New(t)
-	dir, _ := ioutil.TempDir("", "example")
+	dir := t.TempDir()
 	author := object.Signature{Name: "Test", Email: "test@test.com"}
 	repo, _ := git.PlainInit(dir, false)
 	worktree, _ := repo.Worktree()

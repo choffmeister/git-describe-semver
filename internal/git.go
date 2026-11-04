@@ -164,7 +164,7 @@ func FindGitDir(dir string) (string, error) {
 		return "", fmt.Errorf(".git file has no %s prefix", GitDirPrefix)
 	}
 
-	gitdir := strings.Split(line[len(GitDirPrefix):], "\n")[0]
+	gitdir, _, _ := strings.Cut(line[len(GitDirPrefix):], "\n")
 	gitdir = strings.TrimSpace(gitdir)
 	return gitdir, nil
 }
