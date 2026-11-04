@@ -23,7 +23,7 @@ func TestGitTagMap(t *testing.T) {
 	tags, _ := GitTagMap(*repo)
 	assert.Equal(map[string]string{}, *tags)
 
-	commit1, _ := worktree.Commit("first", &git.CommitOptions{Author: &author})
+	commit1, _ := worktree.Commit("first", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	tag1, _ := repo.CreateTag("v1.0.0", commit1, nil)
 	tags, _ = GitTagMap(*repo)
 	assert.Equal(commit1.String(), tag1.Hash().String())
@@ -31,7 +31,7 @@ func TestGitTagMap(t *testing.T) {
 		tag1.Hash().String(): "v1.0.0",
 	}, *tags)
 
-	commit2, _ := worktree.Commit("second", &git.CommitOptions{Author: &author})
+	commit2, _ := worktree.Commit("second", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	tag2, _ := repo.CreateTag("v2.0.0", commit2, &git.CreateTagOptions{
 		Tagger: &object.Signature{
 			Name:  "Foo Bar",
@@ -46,7 +46,7 @@ func TestGitTagMap(t *testing.T) {
 		commit2.String(): "v2.0.0",
 	}, *tags)
 
-	commit3, _ := worktree.Commit("third", &git.CommitOptions{Author: &author})
+	commit3, _ := worktree.Commit("third", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	tag3, _ := repo.CreateTag("fum", commit3, &git.CreateTagOptions{
 		Tagger: &object.Signature{
 			Name:  "Fum",
@@ -78,16 +78,16 @@ func TestGitDescribe(t *testing.T) {
 		assert.Equal(expectedHeadHash, *actualHeadHash)
 	}
 
-	commit1, _ := worktree.Commit("first", &git.CommitOptions{Author: &author})
+	commit1, _ := worktree.Commit("first", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	test("", 1, commit1.String())
 
 	repo.CreateTag("v1.0.0", commit1, nil)
 	test("v1.0.0", 0, commit1.String())
 
-	commit2, _ := worktree.Commit("second", &git.CommitOptions{Author: &author})
+	commit2, _ := worktree.Commit("second", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	test("v1.0.0", 1, commit2.String())
 
-	commit3, _ := worktree.Commit("third", &git.CommitOptions{Author: &author})
+	commit3, _ := worktree.Commit("third", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	test("v1.0.0", 2, commit3.String())
 
 	repo.CreateTag("v2.0.0", commit3, nil)
@@ -110,21 +110,21 @@ func TestGitDescribeWithBranch(t *testing.T) {
 		assert.Equal(expectedHeadHash, *actualHeadHash)
 	}
 
-	commit1, _ := worktree.Commit("first", &git.CommitOptions{Author: &author})
+	commit1, _ := worktree.Commit("first", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	test("", 1, commit1.String())
 
 	repo.CreateTag("v1.0.0", commit1, nil)
 	test("v1.0.0", 0, commit1.String())
 
-	commit2, _ := worktree.Commit("second", &git.CommitOptions{Author: &author})
+	commit2, _ := worktree.Commit("second", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	test("v1.0.0", 1, commit2.String())
 
 	worktree.Checkout(&git.CheckoutOptions{Hash: commit1})
 
-	commit3, _ := worktree.Commit("third", &git.CommitOptions{Author: &author})
+	commit3, _ := worktree.Commit("third", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	test("v1.0.0", 1, commit3.String())
 
-	commit4, _ := worktree.Commit("forth", &git.CommitOptions{Author: &author, Parents: []plumbing.Hash{commit2, commit3}})
+	commit4, _ := worktree.Commit("forth", &git.CommitOptions{Author: &author, AllowEmptyCommits: true, Parents: []plumbing.Hash{commit2, commit3}})
 	test("v1.0.0", 2, commit4.String())
 	repo.CreateTag("v2.0.0", commit3, nil)
 	test("v2.0.0", 1, commit4.String())

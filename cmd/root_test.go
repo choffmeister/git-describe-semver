@@ -22,15 +22,15 @@ func TestRun(t *testing.T) {
 	_, err = run(dir, internal.GenerateVersionOptions{PrereleasePrefix: "dev"})
 	assert.Error(err)
 
-	commit1, _ := worktree.Commit("first", &git.CommitOptions{Author: &author})
+	commit1, _ := worktree.Commit("first", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	repo.CreateTag("invalid", commit1, nil)
 	_, err = run(dir, internal.GenerateVersionOptions{PrereleasePrefix: "dev"})
 	assert.Error(err)
 
-	commit2, _ := worktree.Commit("first", &git.CommitOptions{Author: &author})
+	commit2, _ := worktree.Commit("first", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	repo.CreateTag("v1.0.0", commit2, nil)
 
-	commit3, _ := worktree.Commit("second", &git.CommitOptions{Author: &author})
+	commit3, _ := worktree.Commit("second", &git.CommitOptions{Author: &author, AllowEmptyCommits: true})
 	result, err := run(dir, internal.GenerateVersionOptions{PrereleasePrefix: "dev"})
 	assert.NoError(err)
 	assert.Equal("v1.0.1-dev.1.g"+commit3.String()[0:7], *result)
