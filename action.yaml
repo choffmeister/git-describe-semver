@@ -1,5 +1,5 @@
 name: 'Git describe semver'
-description: ''
+description: 'Replacement for git describe --tags that produces semver compatible versions'
 inputs:
   version:
     description: 'Which git-describe-semver release should be used?'
