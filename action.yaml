@@ -25,6 +25,9 @@ inputs:
   next-release:
     description: 'Bump current version to next release (choices: "major", "minor", "patch")'
     default: ''
+  github-token:
+    description: 'Token to query the GitHub API for the latest release (avoids rate limits)'
+    default: ${{ github.token }}
 outputs:
   version:
     description: 'Version output from git-describe-semver'
@@ -32,33 +35,56 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - if: inputs.version == 'latest'
-      run: |
-        cd /tmp
-        URL=$(curl -fsSL https://api.github.com/repos/choffmeister/git-describe-semver/releases/latest | jq -r '.assets[] | select(.name|test("linux_amd64\\.tar\\.gz$")) | .browser_download_url')
-        curl -fsSL "$URL" | tar xz
+    - run: |
+        set -euo pipefail
+        REPO="choffmeister/git-describe-semver"
+        if [[ "$INPUT_VERSION" == "latest" ]]; then
+          AUTH=()
+          if [[ -n "${GITHUB_TOKEN:-}" ]]; then AUTH=(-H "Authorization: Bearer $GITHUB_TOKEN"); fi
+          TAG="$(curl -fsSL "${AUTH[@]}" "https://api.github.com/repos/$REPO/releases/latest" | jq -r .tag_name)"
+        else
+          TAG="v${INPUT_VERSION#v}"
+        fi
+        if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.+-]*)?$ ]]; then
+          echo "Invalid version: $TAG" >&2
+          exit 1
+        fi
+        ARCHIVE="git-describe-semver_${TAG#v}_linux_amd64.tar.gz"
+        TMP="$(mktemp -d)"
+        cd "$TMP"
+        curl -fsSLO "https://github.com/$REPO/releases/download/$TAG/$ARCHIVE"
+        curl -fsSLO "https://github.com/$REPO/releases/download/$TAG/checksums.txt"
+        grep " $ARCHIVE\$" checksums.txt | sha256sum -c -
+        tar xzf "$ARCHIVE" git-describe-semver
         mv git-describe-semver /usr/local/bin
       shell: bash
-    - if: inputs.version != 'latest'
-      run: |
-        cd /tmp
-        VERSION="$(echo ${{ inputs.version }} | sed 's#^v##')"
-        URL="https://github.com/choffmeister/git-describe-semver/releases/download/v${VERSION}/git-describe-semver_${VERSION}_linux_amd64.tar.gz"
-        curl -fsSL "$URL" | tar xz
-        mv git-describe-semver /usr/local/bin
-      shell: bash
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
     - id: git-describe-semver
       run: |
-        git-describe-semver \
-          ${{ format('--dir="{0}"', inputs.dir) }} \
-          ${{ format('--fallback="{0}"', inputs.fallback) }} \
-          ${{ inputs.drop-prefix == 'true' && format('--drop-prefix') || '' }} \
-          ${{ format('--prerelease-prefix="{0}"', inputs.prerelease-prefix) }} \
-          ${{ format('--prerelease-suffix="{0}"', inputs.prerelease-suffix) }} \
-          ${{ inputs.prerelease-timestamped == 'true' && format('--prerelease-timestamped') || '' }} \
-          ${{ inputs.next-release != '' && format('--next-release="{0}"', inputs.next-release) || '' }} \
-          --format="version=<version>" \
-          $GITHUB_OUTPUT
+        set -euo pipefail
+        ARGS=(
+          --dir="$INPUT_DIR"
+          --fallback="$INPUT_FALLBACK"
+          --prerelease-prefix="$INPUT_PRERELEASE_PREFIX"
+          --prerelease-suffix="$INPUT_PRERELEASE_SUFFIX"
+          --format="version=<version>"
+        )
+        if [[ "$INPUT_DROP_PREFIX" == "true" ]]; then ARGS+=(--drop-prefix); fi
+        if [[ "$INPUT_PRERELEASE_TIMESTAMPED" == "true" ]]; then ARGS+=(--prerelease-timestamped); fi
+        if [[ -n "$INPUT_NEXT_RELEASE" ]]; then ARGS+=(--next-release="$INPUT_NEXT_RELEASE"); fi
+        git-describe-semver "${ARGS[@]}" "$GITHUB_OUTPUT"
       shell: bash
-    - run: echo ${{ steps.git-describe-semver.outputs.version }}
+      env:
+        INPUT_DIR: ${{ inputs.dir }}
+        INPUT_FALLBACK: ${{ inputs.fallback }}
+        INPUT_DROP_PREFIX: ${{ inputs.drop-prefix }}
+        INPUT_PRERELEASE_PREFIX: ${{ inputs.prerelease-prefix }}
+        INPUT_PRERELEASE_SUFFIX: ${{ inputs.prerelease-suffix }}
+        INPUT_PRERELEASE_TIMESTAMPED: ${{ inputs.prerelease-timestamped }}
+        INPUT_NEXT_RELEASE: ${{ inputs.next-release }}
+    - run: echo "$VERSION"
       shell: bash
+      env:
+        VERSION: ${{ steps.git-describe-semver.outputs.version }}
